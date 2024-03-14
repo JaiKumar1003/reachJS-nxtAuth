@@ -1,40 +1,98 @@
 import './index.css'
 
 const FiltersGroup = props => {
-  const {onClickSpecificCategory, categoryOptions, ratingsList} = props
-  const onClickCategory = catgoryId => {
-    onClickSpecificCategory(catgoryId)
-    console.log(catgoryId)
+  const {
+    activeStarId,
+    activeCategoryId,
+    onClickSpecificCategory,
+    onClickSpecificRating,
+    categoryOptions,
+    ratingsList,
+    onChangeSearch,
+    onClickFilter,
+    onKeyEnter,
+  } = props
+
+  const onClickFilterButton = () => {
+    onClickFilter()
   }
+
+  const onClickCategory = categoryId => {
+    onClickSpecificCategory(categoryId)
+  }
+
+  const onClickRating = ratingId => {
+    onClickSpecificRating(ratingId)
+  }
+
+  const onkeypressEnter = event => {
+    onKeyEnter(event.key)
+  }
+  const onChangeSearchInput = event => {
+    onChangeSearch(event.target.value)
+  }
+
   return (
     <div className="filters-group-container">
       <input
+        onKeyPress={onkeypressEnter}
+        onChange={onChangeSearchInput}
         className="product-search-input"
         type="search"
         placeholder="Search"
       />
       <h1 className="category-heading">Category</h1>
       <ul className="category-list">
-        {categoryOptions.map(eachOption => (
-          <li
-            className="category-item"
-            onClick={onClickCategory(eachOption.categoryId)}
-            key={eachOption.categoryId}
-          >
-            {eachOption.name}
-          </li>
-        ))}
+        {categoryOptions.map(eachOption => {
+          const isActive =
+            activeCategoryId === eachOption.categoryId
+              ? 'category-item style-category'
+              : 'category-item'
+
+          const {categoryId, name} = eachOption
+
+          return (
+            <li
+              className={isActive}
+              onClick={() => onClickCategory(categoryId)}
+              key={categoryId}
+            >
+              {name}
+            </li>
+          )
+        })}
       </ul>
       <p className="rating-heading">Rating</p>
       <ul className="rating-list">
-        {ratingsList.map(eachRating => (
-          <li className="rating-card" key={eachRating.ratingId}>
-            <img className="star-img" src={eachRating.imageUrl} alt="rating" />
-            <p className="rating-item">& up</p>
-          </li>
-        ))}
+        {ratingsList.map(eachRating => {
+          const isActive =
+            activeStarId === eachRating.ratingId
+              ? 'rating-item style-rating'
+              : 'rating-item'
+
+          const {ratingId, imageUrl} = eachRating
+
+          return (
+            <li
+              onClick={() => onClickRating(ratingId)}
+              className="rating-card"
+              key={ratingId}
+            >
+              <img
+                className="star-img"
+                src={imageUrl}
+                alt={`rating ${ratingId}`}
+              />
+              <p className={isActive}>& up</p>
+            </li>
+          )
+        })}
       </ul>
-      <button type="button" className="filter-button">
+      <button
+        onClick={onClickFilterButton}
+        type="button"
+        className="filter-button"
+      >
         Clear Filters
       </button>
     </div>
