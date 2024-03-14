@@ -70,6 +70,10 @@ class AllProductsSection extends Component {
     productsList: [],
     isLoading: false,
     activeOptionId: sortbyOptions[0].optionId,
+    activeCategoryId: '',
+    activeStarId: '',
+    searchInput: '',
+    onKey: '',
   }
 
   componentDidMount() {
@@ -84,8 +88,10 @@ class AllProductsSection extends Component {
 
     // TODO: Update the code to get products with filters applied
 
-    const {activeOptionId} = this.state
-    const apiUrl = `https://apis.ccbp.in/products?sort_by=${activeOptionId}`
+    const {activeOptionId, activeCategoryId, activeStarId, searchInput} =
+      this.state
+    const apiUrl = `https://apis.ccbp.in/products?sort_by=${activeOptionId}&category=${activeCategoryId}&title_search=${searchInput}&rating=${activeStarId}`
+
     const options = {
       headers: {
         Authorization: `Bearer ${jwtToken}`,
@@ -107,6 +113,8 @@ class AllProductsSection extends Component {
         productsList: updatedData,
         isLoading: false,
       })
+    } else {
+      this.setState({productsList: undefined, isLoading: false})
     }
   }
 
@@ -118,20 +126,51 @@ class AllProductsSection extends Component {
     const {productsList, activeOptionId} = this.state
 
     // TODO: Add No Products View
-    return (
-      <div className="all-products-container">
-        <ProductsHeader
-          activeOptionId={activeOptionId}
-          sortbyOptions={sortbyOptions}
-          changeSortby={this.changeSortby}
-        />
-        <ul className="products-list">
-          {productsList.map(product => (
-            <ProductCard productData={product} key={product.id} />
-          ))}
-        </ul>
-      </div>
-    )
+    if (productsList === undefined) {
+      return (
+        <div className="error-products-card">
+          <img
+            className="error-products-img"
+            src="https://assets.ccbp.in/frontend/react-js/nxt-trendz/nxt-trendz-products-error-view.png"
+            alt="products failure"
+          />
+          <h1 className="error-products-heading">Opps! Something Went Wrong</h1>
+          <p className="error-products-description">
+            We are having some trouble processing your request. Please try
+            again.
+          </p>
+        </div>
+      )
+    } else if (productsList.length === 0) {
+      return (
+        <div className="no-products-card">
+          <img
+            className="no-products-img"
+            src="https://assets.ccbp.in/frontend/react-js/nxt-trendz/nxt-trendz-no-products-view.png"
+            alt="no products"
+          />
+          <h1 className="no-products-heading">No Products Found</h1>
+          <p className="no-products-description">
+            We could not find any products. Try other filters.
+          </p>
+        </div>
+      )
+    } else {
+      return (
+        <div className="all-products-container">
+          <ProductsHeader
+            activeOptionId={activeOptionId}
+            sortbyOptions={sortbyOptions}
+            changeSortby={this.changeSortby}
+          />
+          <ul className="products-list">
+            {productsList.map(product => (
+              <ProductCard productData={product} key={product.id} />
+            ))}
+          </ul>
+        </div>
+      )
+    }
   }
 
   renderLoader = () => (
@@ -141,13 +180,52 @@ class AllProductsSection extends Component {
   )
 
   onClickSpecificCategory = categoryId => {
-    console.log(categoryId)
+    const findCategory = categoryOptions.find(
+      eachOption => categoryId === eachOption.categoryId,
+    )
+    this.setState({activeCategoryId: findCategory.categoryId}, this.getProducts)
+  }
+
+  onClickSpecificRating = ratingId => {
+    const findRating = ratingsList.find(
+      eachRating => ratingId === eachRating.ratingId,
+    )
+    this.setState({activeStarId: findRating.ratingId}, this.getProducts)
+  }
+
+  onChangeSearch = searchValue => {
+    const {onKey} = this.state
+    if (onKey === 'Enter') {
+      this.setState(
+        prevState => ({searchInput: prevState.searchInput.toLowerCase()}),
+        this.getProducts,
+      )
+    }
+    this.setState({searchInput: searchValue.toLowerCase()})
+  }
+
+  onKeyEnter = keys => {
+    this.setState({onKey: keys})
+  }
+
+  onconClickFilter = () => {
+    this.setState({
+      activeCategoryId: '',
+      activeStarId: '',
+      searchInput: '',
+      productsList: [],
+      isLoading: false,
+      activeOptionId: sortbyOptions[0].optionId,
+    })
   }
 
   // TODO: Add failure view
 
   render() {
-    const {isLoading} = this.state
+    const {isLoading, onKey, searchInput, activeCategoryId, activeStarId} =
+      this.state
+    console.log(onKey)
+    console.log(searchInput)
 
     return (
       <div className="all-products-section">
@@ -156,6 +234,12 @@ class AllProductsSection extends Component {
           onClickSpecificCategory={this.onClickSpecificCategory}
           categoryOptions={categoryOptions}
           ratingsList={ratingsList}
+          activeCategoryId={activeCategoryId}
+          activeStarId={activeStarId}
+          onClickSpecificRating={this.onClickSpecificRating}
+          onChangeSearch={this.onChangeSearch}
+          onClickFilter={this.onClickFilter}
+          onKeyEnter={this.onKeyEnter}
         />
 
         {isLoading ? this.renderLoader() : this.renderProductsList()}
