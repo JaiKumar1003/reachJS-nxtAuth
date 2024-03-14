@@ -50,6 +50,10 @@
   outline: none;
 }
 
+.style-category {
+  color: #0967d2;
+}
+
 .rating-heading {
   color: #12022f;
   font-family: 'Roboto';
@@ -68,6 +72,8 @@
   flex-direction: row;
   justify-content: space-between;
   align-items: center;
+  cursor: pointer;
+  outline: none;
 }
 
 .star-img {
@@ -77,11 +83,13 @@
 .rating-item {
   color: #64748b;
   font-family: 'Roboto';
-  font-size: 18px;
+  font-size: 16px;
   margin-top: 14px;
   margin-bottom: 14px;
-  cursor: pointer;
-  outline: none;
+}
+
+.style-rating {
+  color: #0967d2;
 }
 
 .filter-button {
@@ -96,4 +104,10 @@
   margin-top: 20px;
   cursor: pointer;
   outline: none;
+}
+
+@media screen and (min-width: 768px) {
+  .rating-card {
+    width: 70%;
+  }
 }
