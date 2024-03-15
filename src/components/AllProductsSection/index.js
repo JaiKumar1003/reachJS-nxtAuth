@@ -73,7 +73,6 @@ class AllProductsSection extends Component {
     activeCategoryId: '',
     activeStarId: '',
     searchInput: '',
-    onKey: '',
   }
 
   componentDidMount() {
@@ -193,22 +192,18 @@ class AllProductsSection extends Component {
     this.setState({activeStarId: findRating.ratingId}, this.getProducts)
   }
 
-  onChangeSearch = searchValue => {
-    const {onKey} = this.state
-    if (onKey === 'Enter') {
-      this.setState(
-        prevState => ({searchInput: prevState.searchInput.toLowerCase()}),
-        this.getProducts,
-      )
-    }
-    this.setState({searchInput: searchValue.toLowerCase()})
-  }
-
   onKeyEnter = keys => {
-    this.setState({onKey: keys})
+    const {searchInput} = this.state
+    if (keys === 'Enter') {
+      this.setState({searchInput: searchInput}, this.getProducts)
+    } else {
+      this.setState(prevState => ({
+        searchInput: prevState.searchInput + keys,
+      }))
+    }
   }
 
-  onconClickFilter = () => {
+  onClickFilter = () => {
     this.setState({
       activeCategoryId: '',
       activeStarId: '',
@@ -216,15 +211,14 @@ class AllProductsSection extends Component {
       productsList: [],
       isLoading: false,
       activeOptionId: sortbyOptions[0].optionId,
-    })
+    }, this.getProducts)
   }
 
   // TODO: Add failure view
 
   render() {
-    const {isLoading, onKey, searchInput, activeCategoryId, activeStarId} =
+    const {isLoading, searchInput, activeCategoryId, activeStarId} =
       this.state
-    console.log(onKey)
     console.log(searchInput)
 
     return (
@@ -237,9 +231,9 @@ class AllProductsSection extends Component {
           activeCategoryId={activeCategoryId}
           activeStarId={activeStarId}
           onClickSpecificRating={this.onClickSpecificRating}
-          onChangeSearch={this.onChangeSearch}
           onClickFilter={this.onClickFilter}
           onKeyEnter={this.onKeyEnter}
+          searchInput={searchInput}
         />
 
         {isLoading ? this.renderLoader() : this.renderProductsList()}
