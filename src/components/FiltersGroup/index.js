@@ -8,9 +8,9 @@ const FiltersGroup = props => {
     onClickSpecificRating,
     categoryOptions,
     ratingsList,
-    onChangeSearch,
     onClickFilter,
     onKeyEnter,
+    searchInput,
   } = props
 
   const onClickFilterButton = () => {
@@ -28,15 +28,12 @@ const FiltersGroup = props => {
   const onkeypressEnter = event => {
     onKeyEnter(event.key)
   }
-  const onChangeSearchInput = event => {
-    onChangeSearch(event.target.value)
-  }
 
   return (
     <div className="filters-group-container">
       <input
-        onKeyPress={onkeypressEnter}
-        onChange={onChangeSearchInput}
+        onKeyDown={onkeypressEnter}
+        value={searchInput}
         className="product-search-input"
         type="search"
         placeholder="Search"
